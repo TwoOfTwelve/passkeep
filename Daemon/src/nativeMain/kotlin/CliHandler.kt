@@ -6,7 +6,7 @@ object CliHandler {
 
     suspend fun fetchList(io: IOHandler): List<String> {
         val res = mutableListOf<String>()
-        runCommand(io, "ls", dbFile) {
+        runCommand(io, "ls", "-R", "--flatten", dbFile) {
             res.add(it)
         }
         return res
