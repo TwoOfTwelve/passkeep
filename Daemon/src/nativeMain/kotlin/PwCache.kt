@@ -3,7 +3,7 @@ import kotlinx.coroutines.*
 import platform.posix.*
 
 object PwCache {
-    private val timeout = 20L * 1000
+    private val timeout = 30L * 1000
     private var enteredTime = 0L
     private var cachedPw: String? = null
     private val scope = CoroutineScope(Job())

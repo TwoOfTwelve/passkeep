@@ -18,7 +18,9 @@ val socketPath by lazy {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-fun main() {
+fun main(args: Array<String>) {
+    CliHandler.dbFile = args[0]
+
     runBlocking {
         val selectorManager = SelectorManager(Dispatchers.IO)
         remove(socketPath)

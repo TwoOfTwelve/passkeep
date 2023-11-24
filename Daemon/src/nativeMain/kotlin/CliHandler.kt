@@ -2,7 +2,7 @@ import com.kgit2.process.Command
 import com.kgit2.process.Stdio
 
 object CliHandler {
-    private val dbFile = "/home/alexander/Passwords.kdbx"
+    lateinit var dbFile: String
 
     suspend fun fetchList(io: IOHandler): List<String> {
         val res = mutableListOf<String>()
