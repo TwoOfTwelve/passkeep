@@ -10,4 +10,9 @@ object PwList {
 
         return this.passwords
     }
+
+    fun reset() {
+        passwords = mutableListOf()
+        initialized = false
+    }
 }

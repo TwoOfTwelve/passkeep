@@ -69,6 +69,14 @@ suspend fun handleConnection(connection: Socket) {
             CliHandler.copyUrl(command[1], io)
         }
 
+        "reset-pw" -> {
+            PwCache.reset()
+        }
+
+        "reset-ls" -> {
+            PwList.reset()
+        }
+
         "--help", "-h", "help" -> {
             io.output("Available commands:")
             io.output("")
@@ -77,6 +85,9 @@ suspend fun handleConnection(connection: Socket) {
             io.output("name [entry path]      - Copies the username")
             io.output("url  [entry path]      - Copies the url")
             io.output("exit                   - Stops the daemon")
+            io.output("")
+            io.output("reset-pw               - Resets the cached password")
+            io.output("reset-ls               - Resets the cached password list")
             io.output("")
             io.output("--help, -h, help       - Prints this help")
             io.output("--version, -v, version - Prints the version")

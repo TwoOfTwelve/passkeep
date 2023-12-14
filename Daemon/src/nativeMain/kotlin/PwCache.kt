@@ -50,4 +50,8 @@ object PwCache {
             (spec.tv_sec * 1000) + (spec.tv_nsec / 1000000)
         }
     }
+
+    fun reset() {
+        cachedPw = null
+    }
 }

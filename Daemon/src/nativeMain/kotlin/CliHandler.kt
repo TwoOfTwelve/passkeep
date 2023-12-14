@@ -54,6 +54,9 @@ object CliHandler {
             }
         }
 
-        child.wait()
+        val result = child.wait()
+        if(result.exitStatus() > 0) {
+            PwCache.reset()
+        }
     }
 }
