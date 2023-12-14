@@ -22,7 +22,7 @@ fun main(args: Array<String>) {
     val terminal = isOnTerminal()
 
     kill.launch(Dispatchers.Unconfined) {
-        delay(1.seconds)
+        delay(60.seconds)
         println("Forcing exit due to timeout")
         exit(1)
     }
