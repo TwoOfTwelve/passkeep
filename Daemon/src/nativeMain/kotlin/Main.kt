@@ -36,7 +36,11 @@ fun main(args: Array<String>) {
         while (running) {
             val connection = socket.accept()
             launch(Dispatchers.IO) {
-                handleConnection(connection)
+                try {
+                    handleConnection(connection)
+                } catch (e: Throwable) {
+                    println("error while handling call.")
+                }
             }
         }
         PwCache.stop()
