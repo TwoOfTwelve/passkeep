@@ -6,13 +6,11 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toKString
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
-import kotlinx.coroutines.runBlocking
-import platform.posix.STDIN_FILENO
-import platform.posix.exit
-import platform.posix.getenv
-import platform.posix.isatty
+import kotlinx.coroutines.*
+import platform.posix.*
+import kotlin.time.Duration.Companion.seconds
+
+val kill = CoroutineScope(Job())
 
 @OptIn(ExperimentalForeignApi::class)
 val socketPath by lazy {
@@ -21,7 +19,13 @@ val socketPath by lazy {
 }
 
 fun main(args: Array<String>) {
-    val terminal = isatty(STDIN_FILENO) == 1
+    val terminal = isOnTerminal()
+
+    kill.launch(Dispatchers.Unconfined) {
+        delay(1.seconds)
+        println("Forcing exit due to timeout")
+        exit(1)
+    }
 
     runBlocking {
         val selectorManager = SelectorManager(Dispatchers.IO)
@@ -39,23 +43,23 @@ fun main(args: Array<String>) {
         write.writeStringUtf8(args.joinToString(" ") + "\n")
 
         var done = false
-        while(!done) {
+        while (!done) {
             val line = receive.readUTF8Line()!!
             var cmdIndex = line.indexOf(" ")
-            if(cmdIndex == -1) {
+            if (cmdIndex == -1) {
                 cmdIndex = line.length
             }
 
             val cmd = line.substring(0, cmdIndex)
-            val rest = if(cmdIndex < line.length) {
+            val rest = if (cmdIndex < line.length) {
                 line.substring(cmdIndex + 1)
             } else {
                 ""
             }
 
-            when(cmd) {
+            when (cmd) {
                 "in" -> {
-                    if(terminal) {
+                    if (terminal) {
                         print(rest)
                         write.writeStringUtf8(readln() + "\n")
                     } else {
@@ -65,11 +69,13 @@ fun main(args: Array<String>) {
                         write.writeStringUtf8("$pw\n")
                     }
                 }
+
                 "out" -> {
                     println(rest)
                 }
+
                 "pw" -> {
-                    if(terminal) {
+                    if (terminal) {
                         print(rest)
                         write.writeStringUtf8(readPw() + "\n")
                     } else {
@@ -79,10 +85,24 @@ fun main(args: Array<String>) {
                         write.writeStringUtf8("$pw\n")
                     }
                 }
-                "done" -> {done = true}
+
+                "done" -> {
+                    done = true
+                }
             }
         }
 
         socket.close()
     }
+}
+
+@OptIn(ExperimentalForeignApi::class)
+fun isOnTerminal(): Boolean {
+    val res = isatty(STDIN_FILENO) == 1 && isatty(STDOUT_FILENO) == 1
+    if (!res) {
+        return false
+    }
+
+    val envVar = getenv("FORCE_GUI")?.toKString() ?: ""
+    return envVar != "true"
 }
