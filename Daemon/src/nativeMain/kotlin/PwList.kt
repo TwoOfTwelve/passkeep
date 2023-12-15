@@ -4,8 +4,19 @@ object PwList {
 
     suspend fun list(io: IOHandler): List<String> {
         if(!initialized) {
-            passwords = CliHandler.fetchList(io)
-            initialized = true
+            var remainingTries = 3
+            while(remainingTries-- > 0 && !initialized) {
+                passwords = CliHandler.fetchList(io)
+                if (passwords.isNotEmpty()) {
+                    initialized = true
+                } else {
+                    if(remainingTries > 0) {
+                        io.output("No passwords received. Try again.")
+                    } else {
+                        io.output("No passwords found.")
+                    }
+                }
+            }
         }
 
         return this.passwords

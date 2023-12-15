@@ -95,7 +95,6 @@ suspend fun handleConnection(connection: Socket) {
             io.output("")
             io.output("--help, -h, help       - Prints this help")
             io.output("--version, -v, version - Prints the version")
-
         }
 
         "--version", "-v", "version" -> {
